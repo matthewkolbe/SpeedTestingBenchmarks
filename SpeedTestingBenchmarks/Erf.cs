@@ -88,20 +88,20 @@ namespace SpeedTestingBenchmark
                 b[i] = Math.Sqrt(a[i]);
         }
 
+        static readonly Vector256<double> one = Vector256.Create(1.0);
+        static readonly Vector256<double> negone = Vector256.Create(-1.0);
+        static readonly Vector256<double> a1 = Vector256.Create(0.254829592);
+        static readonly Vector256<double> a2 = Vector256.Create(-0.284496736);
+        static readonly Vector256<double> a3 = Vector256.Create(1.421413741);
+        static readonly Vector256<double> a4 = Vector256.Create(-1.453152027);
+        static readonly Vector256<double> a5 = Vector256.Create(1.061405429);
+        static readonly Vector256<double> p = Vector256.Create(0.3275911);
+        static readonly Vector256<double> sign_bit = Vector256.Create(-0.0);
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static unsafe void ErfValue(double* xx, double* yy)
-        {
-
-            var one = Vector256.Create(1.0);
-            var negone = Vector256.Create(-1.0);
-            var a1 = Vector256.Create(0.254829592);
-            var a2 = Vector256.Create(-0.284496736);
-            var a3 = Vector256.Create(1.421413741);
-            var a4 = Vector256.Create(-1.453152027);
-            var a5 = Vector256.Create(1.061405429);
-            var p = Vector256.Create(0.3275911);
+        {       
             var x = Avx.LoadVector256(xx);
-            var sign_bit = Vector256.Create(-0.0);
             var sign = Avx.And(sign_bit, x);
             sign = Avx.Or(sign, one);
             x = Avx.AndNot(sign_bit, x);
@@ -153,7 +153,6 @@ namespace SpeedTestingBenchmark
         static readonly Vector256<double> p3 = Vector256.Create(4.1665795894E-2);
         static readonly Vector256<double> p4 = Vector256.Create(1.6666665459E-1);
         static readonly Vector256<double> p5 = Vector256.Create(5.0000001201E-1);
-        static readonly Vector256<double> one = Vector256.Create(1.0);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static unsafe void ExpDouble(ref Vector256<double> x, out Vector256<double> y)
