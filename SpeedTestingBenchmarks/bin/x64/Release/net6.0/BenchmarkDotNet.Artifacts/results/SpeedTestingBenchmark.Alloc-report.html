@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>SpeedTestingBenchmark.Alloc-20220225-151512</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet=v0.13.1, OS=Windows 10.0.19043.1526 (21H1/May2021Update)
+AMD Ryzen 9 5900X, 1 CPU, 24 logical and 12 physical cores
+.NET SDK=6.0.100
+  [Host]     : .NET 6.0.1 (6.0.121.56705), X64 RyuJIT
+  DefaultJob : .NET 6.0.1 (6.0.121.56705), X64 RyuJIT
+</code></pre>
+<pre><code></code></pre>
+
+<table>
+<thead><tr><th>        Method</th><th>  Mean</th><th>Error</th><th>StdDev</th><th>Gen 0</th><th>Gen 1</th><th>Allocated</th>
+</tr>
+</thead><tbody><tr><td>SmallStackAlloc</td><td>6.502 ns</td><td>0.0331 ns</td><td>0.0277 ns</td><td>-</td><td>-</td><td>-</td>
+</tr><tr><td>SmallAlloc</td><td>11.693 ns</td><td>0.2366 ns</td><td>0.2097 ns</td><td>0.0220</td><td>-</td><td>368 B</td>
+</tr><tr><td>SmallObjectPoolAlloc</td><td>15.294 ns</td><td>0.0651 ns</td><td>0.0609 ns</td><td>-</td><td>-</td><td>-</td>
+</tr><tr><td>MidStackAlloc</td><td>127.096 ns</td><td>0.3453 ns</td><td>0.3229 ns</td><td>-</td><td>-</td><td>-</td>
+</tr><tr><td>MidAlloc</td><td>147.084 ns</td><td>1.5680 ns</td><td>1.3900 ns</td><td>0.4809</td><td>0.0072</td><td>8,048 B</td>
+</tr><tr><td>MidObjectPoolAlloc</td><td>12.564 ns</td><td>0.0907 ns</td><td>0.0849 ns</td><td>-</td><td>-</td><td>-</td>
+</tr><tr><td>BigStackAlloc</td><td>4,215.842 ns</td><td>9.9904 ns</td><td>8.8563 ns</td><td>-</td><td>-</td><td>-</td>
+</tr><tr><td>BigAlloc</td><td>2,091.175 ns</td><td>32.2896 ns</td><td>30.2037 ns</td><td>9.5215</td><td>-</td><td>160,048 B</td>
+</tr><tr><td>BigObjectPoolAlloc</td><td>11.400 ns</td><td>0.0414 ns</td><td>0.0367 ns</td><td>-</td><td>-</td><td>-</td>
+</tr></tbody></table>
+</body>
+</html>

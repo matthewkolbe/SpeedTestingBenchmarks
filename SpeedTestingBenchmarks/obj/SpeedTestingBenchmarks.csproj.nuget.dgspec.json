@@ -1,0 +1,84 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Users\\kolbs\\source\\repos\\SpeedTestingBenchmarks\\SpeedTestingBenchmarks\\SpeedTestingBenchmarks.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\kolbs\\source\\repos\\SpeedTestingBenchmarks\\SpeedTestingBenchmarks\\SpeedTestingBenchmarks.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\kolbs\\source\\repos\\SpeedTestingBenchmarks\\SpeedTestingBenchmarks\\SpeedTestingBenchmarks.csproj",
+        "projectName": "SpeedTestingBenchmarks",
+        "projectPath": "C:\\Users\\kolbs\\source\\repos\\SpeedTestingBenchmarks\\SpeedTestingBenchmarks\\SpeedTestingBenchmarks.csproj",
+        "packagesPath": "C:\\Users\\kolbs\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\kolbs\\source\\repos\\SpeedTestingBenchmarks\\SpeedTestingBenchmarks\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\kolbs\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "Accord": {
+              "target": "Package",
+              "version": "[3.8.0, )"
+            },
+            "Accord.Math": {
+              "target": "Package",
+              "version": "[3.8.0, )"
+            },
+            "BenchmarkDotNet": {
+              "target": "Package",
+              "version": "[0.13.1, )"
+            },
+            "MathNet.Numerics": {
+              "target": "Package",
+              "version": "[4.15.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

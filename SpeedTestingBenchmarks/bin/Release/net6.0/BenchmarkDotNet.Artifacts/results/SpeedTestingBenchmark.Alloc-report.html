@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>SpeedTestingBenchmark.Alloc-20220225-150410</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet=v0.13.1, OS=Windows 10.0.19043.1526 (21H1/May2021Update)
+AMD Ryzen 9 5900X, 1 CPU, 24 logical and 12 physical cores
+.NET SDK=6.0.100
+  [Host]     : .NET 6.0.1 (6.0.121.56705), X64 RyuJIT  [AttachedDebugger]
+  DefaultJob : .NET 6.0.1 (6.0.121.56705), X64 RyuJIT
+</code></pre>
+<pre><code></code></pre>
+
+<table>
+<thead><tr><th>        Method</th><th>  Mean</th><th>Error</th><th>StdDev</th><th>Gen 0</th><th>Gen 1</th><th>Allocated</th>
+</tr>
+</thead><tbody><tr><td>SmallStackAlloc</td><td>6.461 ns</td><td>0.0194 ns</td><td>0.0181 ns</td><td>-</td><td>-</td><td>-</td>
+</tr><tr><td>SmallAlloc</td><td>11.686 ns</td><td>0.0843 ns</td><td>0.0789 ns</td><td>0.0220</td><td>-</td><td>368 B</td>
+</tr><tr><td>SmallObjectPoolAlloc</td><td>11.977 ns</td><td>0.0232 ns</td><td>0.0193 ns</td><td>-</td><td>-</td><td>-</td>
+</tr><tr><td>MidStackAlloc</td><td>126.761 ns</td><td>0.7280 ns</td><td>0.6810 ns</td><td>-</td><td>-</td><td>-</td>
+</tr><tr><td>MidAlloc</td><td>152.378 ns</td><td>2.8296 ns</td><td>2.5084 ns</td><td>0.4809</td><td>0.0072</td><td>8,048 B</td>
+</tr><tr><td>MidObjectPoolAlloc</td><td>12.788 ns</td><td>0.0427 ns</td><td>0.0333 ns</td><td>-</td><td>-</td><td>-</td>
+</tr><tr><td>BigStackAlloc</td><td>4,181.058 ns</td><td>8.5916 ns</td><td>7.1744 ns</td><td>-</td><td>-</td><td>-</td>
+</tr><tr><td>BigAlloc</td><td>1,891.351 ns</td><td>18.1355 ns</td><td>16.9640 ns</td><td>9.5215</td><td>-</td><td>160,048 B</td>
+</tr><tr><td>BigObjectPoolAlloc</td><td>11.340 ns</td><td>0.0142 ns</td><td>0.0126 ns</td><td>-</td><td>-</td><td>-</td>
+</tr></tbody></table>
+</body>
+</html>
