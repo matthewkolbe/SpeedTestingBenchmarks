@@ -58,7 +58,20 @@ namespace SpeedTestingBenchmark
 
         [Benchmark]
         [SkipLocalsInit]
-        public unsafe double SmallStackAllocFixedWithApplyAvx()
+        public double SmallStackAllocFixedWithApplyAvx()
+        {
+            Span<double> a = stackalloc double[SMALLN];
+            Span<double> b = stackalloc double[SMALLN];
+
+            PointerOperators.ApplyAvx(a, SMALLN, 0);
+            PointerOperators.ApplyAvx(b, SMALLN, 0);
+
+            return a[0] + b[0] + a[SMALLN - 1] + b[SMALLN - 1];
+        }
+
+        [Benchmark]
+        [SkipLocalsInit]
+        public unsafe double SmallStackAllocFixedWithApplyAvxNoSpan()
         {
             double* a = stackalloc double[SMALLN];
             double* b = stackalloc double[SMALLN];
@@ -102,10 +115,10 @@ namespace SpeedTestingBenchmark
 
         [Benchmark]
         [SkipLocalsInit]
-        public unsafe double MidStackAllocFixedWithApplyAvx()
+        public double MidStackAllocFixedWithApplyAvx()
         {
-            double* a = stackalloc double[MIDN];
-            double* b = stackalloc double[MIDN];
+            Span<double> a = stackalloc double[MIDN];
+            Span<double> b = stackalloc double[MIDN];
 
             PointerOperators.ApplyAvx(a, MIDN, 0);
             PointerOperators.ApplyAvx(b, MIDN, 0);
@@ -149,10 +162,10 @@ namespace SpeedTestingBenchmark
 
         [Benchmark]
         [SkipLocalsInit]
-        public unsafe double BigStackAllocFixedWithApplyAvx()
+        public double BigStackAllocFixedWithApplyAvx()
         {
-            double* a = stackalloc double[BIGN];
-            double* b = stackalloc double[BIGN];
+            Span<double> a = stackalloc double[BIGN];
+            Span<double> b = stackalloc double[BIGN];
 
             PointerOperators.ApplyAvx(a, BIGN, 0);
             PointerOperators.ApplyAvx(b, BIGN, 0);
@@ -191,14 +204,13 @@ namespace SpeedTestingBenchmark
 
         [Benchmark]
         [SkipLocalsInit]
-        public unsafe double SmallStackAlloc()
+        public double SmallStackAlloc()
         {
-            double* a = stackalloc double[SMALLN];
-            double* b = stackalloc double[SMALLN];
+            Span<double> a = stackalloc double[SMALLN];
+            Span<double> b = stackalloc double[SMALLN];
 
             return a[0] + b[0] + a[SMALLN - 1] + b[SMALLN - 1];
         }
-
 
         [Benchmark]
         public double SmallObjectPoolAlloc()
@@ -225,10 +237,10 @@ namespace SpeedTestingBenchmark
 
         [Benchmark]
         [SkipLocalsInit]
-        public unsafe double MidStackAlloc()
+        public double MidStackAlloc()
         {
-            double* a = stackalloc double[MIDN];
-            double* b = stackalloc double[MIDN];
+            Span<double> a = stackalloc double[MIDN];
+            Span<double> b = stackalloc double[MIDN];
 
             return a[0] + b[0] + a[MIDN - 1] + b[MIDN - 1];
         }
@@ -258,10 +270,10 @@ namespace SpeedTestingBenchmark
 
         [Benchmark]
         [SkipLocalsInit]
-        public unsafe double BigStackAlloc()
+        public double BigStackAlloc()
         {
-            double* a = stackalloc double[BIGN];
-            double* b = stackalloc double[BIGN];
+            Span<double> a = stackalloc double[BIGN];
+            Span<double> b = stackalloc double[BIGN];
 
             return a[0] + b[0] + a[BIGN - 1] + b[BIGN - 1];
         }
@@ -336,6 +348,24 @@ namespace SpeedTestingBenchmark
         const uint MAX_MINUS_SIXTEEN = 0b_1111_1111_1111_1111_1111_1111_1111_0000;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static unsafe void ApplyAvx(Span<double> v, uint n, double value)
+        {
+            fixed(double* vv = v)
+            for (int i = 0; i < (n - 3); i += 4)
+            {
+                var x = Avx.BroadcastScalarToVector256(&value);
+                Avx.Store(vv + i, x);
+            }
+
+            // gets the closest power of 4 below n
+            var nn = ((n >> 2) << 2);
+
+            // clean up the residual
+            for (int i = (int)nn; i < n; i++)
+                v[i] = value;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static unsafe void ApplyAvx(double* v, uint n, double value)
         {
             for (int i = 0; i < (n - 3); i += 4)
@@ -348,7 +378,7 @@ namespace SpeedTestingBenchmark
             var nn = ((n >> 2) << 2);
 
             // clean up the residual
-            for (uint i = nn; i < n; i++)
+            for (int i = (int)nn; i < n; i++)
                 v[i] = value;
         }
 
