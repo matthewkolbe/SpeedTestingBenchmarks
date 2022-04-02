@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
 using System;
+using System.Buffers;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,15 +31,7 @@ namespace SpeedTestingBenchmark
         const int BIGN = 10000;
         const int MIDN = 500;
         const int SMALLN = 20;
-        DoubleArrayObjectPool big_pool, mid_pool, small_pool;
-
-        [GlobalSetup]
-        public void Setup()
-        {
-            big_pool = new DoubleArrayObjectPool(BIGN, 2);
-            mid_pool = new DoubleArrayObjectPool(MIDN, 2);
-            small_pool = new DoubleArrayObjectPool(SMALLN, 2);
-        }
+        
 
 
         [Benchmark]
@@ -46,6 +39,32 @@ namespace SpeedTestingBenchmark
         {
             double* a = stackalloc double[SMALLN];
             double* b = stackalloc double[SMALLN];
+
+            return a[0] + b[0] + a[SMALLN - 1] + b[SMALLN - 1];
+        }
+
+        [Benchmark]
+        [SkipLocalsInit]
+        public unsafe double SmallStackAllocFixed()
+        {
+            double* a = stackalloc double[SMALLN];
+            double* b = stackalloc double[SMALLN];
+
+            Unsafe.InitBlock(a, 0, SMALLN * sizeof(double));
+            Unsafe.InitBlock(b, 0, SMALLN * sizeof(double));
+
+            return a[0] + b[0] + a[SMALLN - 1] + b[SMALLN - 1];
+        }
+
+        [Benchmark]
+        [SkipLocalsInit]
+        public unsafe double SmallStackAllocFixedWithApplyAvx()
+        {
+            double* a = stackalloc double[SMALLN];
+            double* b = stackalloc double[SMALLN];
+
+            PointerOperators.ApplyAvx(a, SMALLN, 0);
+            PointerOperators.ApplyAvx(b, SMALLN, 0);
 
             return a[0] + b[0] + a[SMALLN - 1] + b[SMALLN - 1];
         }
@@ -60,24 +79,36 @@ namespace SpeedTestingBenchmark
         }
 
         [Benchmark]
-        public double SmallObjectPoolAlloc()
-        {
-            small_pool.Get(out double[] a);
-            small_pool.Get(out double[] b);
-
-            double r = a[0] + b[0] + a[SMALLN - 1] + b[SMALLN - 1];
-
-            small_pool.Add(a);
-            small_pool.Add(b);
-
-            return r;
-        }
-
-        [Benchmark]
         public unsafe double MidStackAlloc()
         {
             double* a = stackalloc double[MIDN];
             double* b = stackalloc double[MIDN];
+
+            return a[0] + b[0] + a[MIDN - 1] + b[MIDN - 1];
+        }
+
+        [Benchmark]
+        [SkipLocalsInit]
+        public unsafe double MidStackAllocFixed()
+        {
+            double* a = stackalloc double[MIDN];
+            double* b = stackalloc double[MIDN];
+
+            Unsafe.InitBlock(a, 0, MIDN * sizeof(double));
+            Unsafe.InitBlock(b, 0, MIDN * sizeof(double));
+
+            return a[0] + b[0] + a[MIDN - 1] + b[MIDN - 1];
+        }
+
+        [Benchmark]
+        [SkipLocalsInit]
+        public unsafe double MidStackAllocFixedWithApplyAvx()
+        {
+            double* a = stackalloc double[MIDN];
+            double* b = stackalloc double[MIDN];
+
+            PointerOperators.ApplyAvx(a, MIDN, 0);
+            PointerOperators.ApplyAvx(b, MIDN, 0);
 
             return a[0] + b[0] + a[MIDN - 1] + b[MIDN - 1];
         }
@@ -91,25 +122,40 @@ namespace SpeedTestingBenchmark
             return a[0] + b[0] + a[MIDN - 1] + b[MIDN - 1];
         }
 
-        [Benchmark]
-        public double MidObjectPoolAlloc()
-        {
-            mid_pool.Get(out double[] a);
-            mid_pool.Get(out double[] b);
-
-            double r = a[0] + b[0] + a[MIDN - 1] + b[MIDN - 1];
-
-            mid_pool.Add(a);
-            mid_pool.Add(b);
-
-            return r;
-        }
 
         [Benchmark]
         public unsafe double BigStackAlloc()
         {
             double* a = stackalloc double[BIGN];
             double* b = stackalloc double[BIGN];
+
+            return a[0] + b[0] + a[BIGN - 1] + b[BIGN - 1];
+        }
+
+
+
+        [Benchmark]
+        [SkipLocalsInit]
+        public unsafe double BigStackAllocFixed()
+        {
+            double* a = stackalloc double[BIGN];
+            double* b = stackalloc double[BIGN];
+
+            Unsafe.InitBlock(a, 0, BIGN * sizeof(double));
+            Unsafe.InitBlock(b, 0, BIGN * sizeof(double));
+
+            return a[0] + b[0] + a[BIGN - 1] + b[BIGN - 1];
+        }
+
+        [Benchmark]
+        [SkipLocalsInit]
+        public unsafe double BigStackAllocFixedWithApplyAvx()
+        {
+            double* a = stackalloc double[BIGN];
+            double* b = stackalloc double[BIGN];
+
+            PointerOperators.ApplyAvx(a, BIGN, 0);
+            PointerOperators.ApplyAvx(b, BIGN, 0);
 
             return a[0] + b[0] + a[BIGN - 1] + b[BIGN - 1];
         }
@@ -123,16 +169,113 @@ namespace SpeedTestingBenchmark
             return a[0] + b[0] + a[BIGN - 1] + b[BIGN - 1];
         }
 
+    }
+
+    [MemoryDiagnoser]
+    public unsafe class AllocNoZero
+    {
+        const int BIGN = 10000;
+        const int MIDN = 500;
+        const int SMALLN = 20;
+
+        ArrayPool<double> pool = ArrayPool<double>.Create();
+
+        [Benchmark]
+        public double SmallAlloc()
+        {
+            double[] a = GC.AllocateUninitializedArray<double>(SMALLN);
+            double[] b = GC.AllocateUninitializedArray<double>(SMALLN);
+
+            return a[0] + b[0] + a[SMALLN - 1] + b[SMALLN - 1];
+        }
+
+        [Benchmark]
+        [SkipLocalsInit]
+        public unsafe double SmallStackAlloc()
+        {
+            double* a = stackalloc double[SMALLN];
+            double* b = stackalloc double[SMALLN];
+
+            return a[0] + b[0] + a[SMALLN - 1] + b[SMALLN - 1];
+        }
+
+
+        [Benchmark]
+        public double SmallObjectPoolAlloc()
+        {
+            var a = pool.Rent(SMALLN);
+            var b = pool.Rent(SMALLN);
+
+            double r = a[0] + b[0] + a[SMALLN - 1] + b[SMALLN - 1];
+
+            pool.Return(a);
+            pool.Return(b);
+
+            return r;
+        }
+
+        [Benchmark]
+        public double MidAlloc()
+        {
+            double[] a = GC.AllocateUninitializedArray<double>(MIDN);
+            double[] b = GC.AllocateUninitializedArray<double>(MIDN);
+
+            return a[0] + b[0] + a[MIDN - 1] + b[MIDN - 1];
+        }
+
+        [Benchmark]
+        [SkipLocalsInit]
+        public unsafe double MidStackAlloc()
+        {
+            double* a = stackalloc double[MIDN];
+            double* b = stackalloc double[MIDN];
+
+            return a[0] + b[0] + a[MIDN - 1] + b[MIDN - 1];
+        }
+
+        [Benchmark]
+        public double MidObjectPoolAlloc()
+        {
+            var a = pool.Rent(MIDN);
+            var b = pool.Rent(MIDN);
+
+            double r = a[0] + b[0] + a[MIDN - 1] + b[MIDN - 1];
+
+            pool.Return(a);
+            pool.Return(b);
+
+            return r;
+        }
+
+        [Benchmark]
+        public double BigAlloc()
+        {
+            double[] a = GC.AllocateUninitializedArray<double>(BIGN);
+            double[] b = GC.AllocateUninitializedArray<double>(BIGN);
+
+            return a[0] + b[0] + a[BIGN - 1] + b[BIGN - 1];
+        }
+
+        [Benchmark]
+        [SkipLocalsInit]
+        public unsafe double BigStackAlloc()
+        {
+            double* a = stackalloc double[BIGN];
+            double* b = stackalloc double[BIGN];
+
+            return a[0] + b[0] + a[BIGN - 1] + b[BIGN - 1];
+        }
+
         [Benchmark]
         public double BigObjectPoolAlloc()
         {
-            big_pool.Get(out double[] a);
-            big_pool.Get(out double[] b);
+            var a = pool.Rent(BIGN);
+            var b = pool.Rent(BIGN);
 
             double r = a[0] + b[0] + a[BIGN - 1] + b[BIGN - 1];
 
-            big_pool.Add(a);
-            big_pool.Add(b);
+            pool.Return(a);
+            pool.Return(b);
 
             return r;
         }
@@ -185,64 +328,6 @@ namespace SpeedTestingBenchmark
         public double[] Y = new double[8];
     }
 
-    public class ObjectPool<T> where T : class
-    {
-        private readonly Stack<T> objects;
-
-        public ObjectPool()
-        {
-            this.objects = new Stack<T>();
-        }
-
-        public ObjectPool(IEnumerable<T> initial_items)
-        {
-            this.objects = new Stack<T>(initial_items);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool TryGet(out T obj)
-        {
-            if (!this.objects.TryPop(out T inner))
-            {
-                obj = null;
-                return false;
-            }
-            else
-            {
-                obj = inner;
-                return true;
-            }
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Add(T item) => this.objects.Push(item);
-    }
-
-    public class DoubleArrayObjectPool
-    {
-        ObjectPool<double[]> pool;
-        int size;
-        public DoubleArrayObjectPool(int size, int init_count)
-        {
-            this.size = size;
-            this.pool = new ObjectPool<double[]>();
-
-            for (int i = 0; i < init_count; i++)
-                this.pool.Add(new double[size]);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Get(out double[] obj)
-        {
-            if (!this.pool.TryGet(out double[] inner))
-                obj = new double[this.size];
-            else
-                obj = inner;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Add(double[] item) => this.pool.Add(item);
-    }
 
     public static class PointerOperators
     {

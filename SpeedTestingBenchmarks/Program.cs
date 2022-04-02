@@ -36,8 +36,9 @@ using SpeedTestingBenchmark;
 //var summary = BenchmarkRunner.Run<InterfaceCost>();
 //var summary = BenchmarkRunner.Run<Mod8Test>();
 //var summary = BenchmarkRunner.Run<Alloc>();
+var summary = BenchmarkRunner.Run<AllocNoZero>();
 //var summary = BenchmarkRunner.Run<ArrayMemberAccess>();
 //var summary = BenchmarkRunner.Run<Inlining>();
-var summary = BenchmarkRunner.Run<Erf>();
+//var summary = BenchmarkRunner.Run<Erf>();
 
 Console.ReadLine();
