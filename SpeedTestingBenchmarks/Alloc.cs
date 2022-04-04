@@ -395,10 +395,8 @@ namespace SpeedTestingBenchmark
                 vresult = Avx.Add(rr, vresult);
             }
 
-            vresult = Avx.HorizontalAdd(vresult, vresult);
-            vresult = Avx.HorizontalAdd(vresult, vresult);
+            var r = Add(ref vresult);
 
-            var r = vresult.GetElement(0);
             // gets the closest power of 4 below n
             var nn = n & MAX_MINUS_FOUR; // ((n >> 2) << 2);
 
@@ -445,10 +443,7 @@ namespace SpeedTestingBenchmark
                 vresult = Avx.Add(rr, vresult);
             }
 
-            vresult = Avx.HorizontalAdd(vresult, vresult);
-            vresult = Avx.HorizontalAdd(vresult, vresult);
-
-            var r = vresult.GetElement(0);
+            var r = Add(ref vresult);
 
             // gets the closest power of 4 below n
             var nn = n & MAX_MINUS_FOUR; // ((n >> 2) << 2);
@@ -458,6 +453,16 @@ namespace SpeedTestingBenchmark
                 r += x[i] * y[i];
 
             return r;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static unsafe double Add(ref Vector256<double> v)
+        {
+            var low = Vector256.GetLower(v);
+            low = Avx.Add(low, Avx.ExtractVector128(v, 1));
+            low = Sse2.Add(low, Sse2.UnpackHigh(low, low));
+
+            return low.GetElement(0);
         }
     }
 }
